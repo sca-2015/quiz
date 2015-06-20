@@ -11,3 +11,8 @@ exports.answer = function (req,res) {
 		res.render('quizes/answer', {respuesta: 'Incorrecto', title: 'Quiz'});
 	}
 };
+
+// GET /quizes/author
+exports.author = function (req,res) {
+	res.render('quizes/author', {autor: 'Miguel Angel Romero', title: 'Quiz', foto: '/images/foto.jpg'});
+};
