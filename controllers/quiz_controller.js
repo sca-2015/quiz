@@ -1,5 +1,17 @@
 var models = require("../models/models.js");
 
+//Autoload - factoriza el código si la ruta incluye el parámetro :quizId
+exports.load = function(req, res, next, quizId) {
+	models.Quiz.find(quizId).then(function(quiz){
+		if (quiz){
+		  req.quiz = quiz;
+		  next();
+		} else {
+		  next(new Error("No existe quizId="+quizId));
+		}
+	}).catch(function(error){ next(error);});
+};
+
 // GET /quizes
 exports.index = function (req,res) {
 	models.Quiz.findAll().then(function(quizes){
@@ -9,20 +21,16 @@ exports.index = function (req,res) {
 
 // GET /quizes/:id
 exports.show = function (req,res) {
-	models.Quiz.find(req.params.quizId).then(function(quiz){
-		res.render('quizes/show', {quiz: quiz, title: 'Quiz'});
-	})
+	res.render('quizes/show', {quiz: req.quiz, title: 'Quiz'});
 };
 
 // GET /quizes/:id/answer
 exports.answer = function (req,res) {
-	models.Quiz.find(req.params.quizId).then(function(quiz){
-		if (req.query.respuesta === quiz.respuesta) {
-			res.render('quizes/answer', {respuesta: 'Correcto', title: 'Quiz'});
-		} else {
-			res.render('quizes/answer', {respuesta: 'Incorrecto', title: 'Quiz'});
-		}
-	})
+	if (req.query.respuesta === req.quiz.respuesta) {
+		res.render('quizes/answer', {quiz: req.quiz, respuesta: 'Correcto', title: 'Quiz'});
+	} else {
+		res.render('quizes/answer', {quiz: req.quiz, respuesta: 'Incorrecto', title: 'Quiz'});
+	}
 };
 
 // GET /quizes/author
